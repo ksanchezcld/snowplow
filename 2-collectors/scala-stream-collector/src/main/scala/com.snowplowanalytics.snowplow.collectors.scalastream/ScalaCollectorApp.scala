@@ -72,24 +72,19 @@ object ScalaCollector {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val sinks = collectorConf.sink.sinkType match {
-      case Kinesis => {
-        lazy val executorService =
-          new ScheduledThreadPoolExecutor(collectorConf.sink.kinesis.threadPoolSize)
-        val good = KinesisSink.createAndInitialize(collectorConf.sink, InputType.Good, executorService)
-        val bad  = KinesisSink.createAndInitialize(collectorConf.sink, InputType.Bad, executorService)
-        CollectorSinks(good, bad) 
+    val sinks = {
+      val (good, bad) = collectorConf.sink.sinkType match {
+        case Kinesis =>
+          val es = new ScheduledThreadPoolExecutor(collectorConf.sink.kinesis.threadPoolSize)
+          (KinesisSink.createAndInitialize(collectorConf.sink, InputType.Good, es),
+            KinesisSink.createAndInitialize(collectorConf.sink, InputType.Bad, es))
+        case Kafka =>
+          (new KafkaSink(collectorConf.sink, InputType.Good),
+            new KafkaSink(collectorConf.sink, InputType.Bad))
+        case Stdout =>
+          (new StdoutSink(InputType.Good), new StdoutSink(InputType.Bad))
       }
-      case Kafka => {
-        val good = new KafkaSink(collectorConf.sink, InputType.Good)
-        val bad  = new KafkaSink(collectorConf.sink, InputType.Bad)
-        CollectorSinks(good, bad)
-      }
-      case Stdout  => {
-        val good = new StdoutSink(InputType.Good)
-        val bad = new StdoutSink(InputType.Bad)
-        CollectorSinks(good, bad) 
-      }
+      CollectorSinks(good, bad) 
     }
 
     val route = new CollectorRoute {

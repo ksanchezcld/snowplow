@@ -67,7 +67,10 @@ package model {
   case class P3PConfig(policyRef: String, CP: String)
   case class AWSConfig(accessKey: String, secretKey: String)
   case class StreamConfig(region: String, good: String, bad: String) {
-    val endpoint = s"https://kinesis.${region}.amazonaws.com"
+    val endpoint = region match {
+      case cn@"cn-north-1" => s"https://kinesis.$cn.amazonaws.com.cn"
+      case _ => s"https://kinesis.$region.amazonaws.com"
+    }
   }
   case class BackoffPolicyConfig(minBackoff: Long, maxBackoff: Long)
   case class KinesisConfig(
