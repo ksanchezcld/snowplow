@@ -60,6 +60,15 @@ object BuildSettings {
   // sbt-assembly settings for building an executable
   import sbtassembly.AssemblyPlugin.autoImport._
   lazy val sbtAssemblySettings = Seq(
+    // replace lbs to keep it from conflicting with tls
+    assemblyExcludedJars in assembly := {
+      val cp = (fullClasspath in assembly).value
+      cp filter { af =>
+        val file = af.data
+        (file.getName == "scala-library-" + scalaVersion.value + ".jar") &&
+          (file.getPath contains "org.scala-lang") // . instead of / for ivy
+      }
+    },
     // Executable jarfile
     assemblyOption in assembly :=
       (assemblyOption in assembly).value.copy(prependShellScript = Some(

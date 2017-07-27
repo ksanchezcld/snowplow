@@ -43,7 +43,11 @@ object KinesisSink {
    * @param config
    * @param inputType
    */
-  def createAndInitialize(config: CollectorConfig, inputType: InputType.InputType, executorService: ScheduledExecutorService): KinesisSink = {
+  def createAndInitialize(
+    config: SinkConfig,
+    inputType: InputType.InputType,
+    executorService: ScheduledExecutorService
+  ): KinesisSink = {
     val ks = new KinesisSink(config, inputType, executorService)
     ks.scheduleFlush()
 
@@ -64,20 +68,24 @@ object KinesisSink {
 /**
  * Kinesis Sink for the Scala collector.
  */
-class KinesisSink private (config: CollectorConfig, inputType: InputType.InputType, val executorService: ScheduledExecutorService) extends Sink {
+class KinesisSink private (
+  config: SinkConfig,
+  inputType: InputType.InputType,
+  val executorService: ScheduledExecutorService
+) extends Sink {
   // Records must not exceed MaxBytes - 1MB
   val MaxBytes = 1000000L
   val BackoffTime = 3000L
 
-  val ByteThreshold = config.byteLimit
-  val RecordThreshold = config.recordLimit
-  val TimeThreshold = config.timeLimit
+  val ByteThreshold = config.buffer.byteLimit
+  val RecordThreshold = config.buffer.recordLimit
+  val TimeThreshold = config.buffer.timeLimit
 
-  private val maxBackoff = config.maxBackoff
-  private val minBackoff = config.minBackoff
+  private val maxBackoff = config.kinesis.backoffPolicy.maxBackoff
+  private val minBackoff = config.kinesis.backoffPolicy.minBackoff
   private val randomGenerator = new java.util.Random()
 
-  log.info("Creating thread pool of size " + config.threadpoolSize)
+  log.info("Creating thread pool of size " + config.kinesis.threadPoolSize)
 
   implicit lazy val ec = concurrent.ExecutionContext.fromExecutorService(executorService)
 
@@ -109,8 +117,8 @@ class KinesisSink private (config: CollectorConfig, inputType: InputType.InputTy
 
   // The output stream for this sink.
   private val streamName = inputType match {
-    case InputType.Good => config.streamGoodName
-    case InputType.Bad  => config.streamBadName
+    case InputType.Good => config.kinesis.stream.good
+    case InputType.Bad  => config.kinesis.stream.bad
   }
   require(streamExists(streamName), s"Kinesis stream $streamName doesn't exist")
 
@@ -146,8 +154,8 @@ class KinesisSink private (config: CollectorConfig, inputType: InputType.InputTy
    * @return the initialized AmazonKinesisClient
    */
   private def createKinesisClient(): AmazonKinesis = {
-    val accessKey = config.awsAccessKey
-    val secretKey = config.awsSecretKey
+    val accessKey = config.kinesis.aws.accessKey
+    val secretKey = config.kinesis.aws.secretKey
     val provider: AWSCredentialsProvider = if (isDefault(accessKey) && isDefault(secretKey)) {
       new EnvironmentVariableCredentialsProvider()
     } else if (isDefault(accessKey) || isDefault(secretKey)) {
@@ -167,7 +175,8 @@ class KinesisSink private (config: CollectorConfig, inputType: InputType.InputTy
     val client = AmazonKinesisClientBuilder
       .standard()
       .withCredentials(provider)
-      .withEndpointConfiguration(new EndpointConfiguration(config.streamEndpoint, config.streamRegion))
+      .withEndpointConfiguration(new EndpointConfiguration(
+        config.kinesis.stream.endpoint, config.kinesis.stream.region))
       .build()
 
     client
@@ -303,5 +312,5 @@ class KinesisSink private (config: CollectorConfig, inputType: InputType.InputTy
    */
   private def isEnv(key: String): Boolean = (key == "env")
 
-  override def getType = SinkType.Kinesis
+  override def getType = Kinesis
 }

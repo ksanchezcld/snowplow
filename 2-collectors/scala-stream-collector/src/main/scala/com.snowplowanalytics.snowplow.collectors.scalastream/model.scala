@@ -14,6 +14,8 @@
  */
 package com.snowplowanalytics.snowplow.collectors.scalastream
 
+import scala.concurrent.duration.FiniteDuration
+
 import sinks._
 
 package model {
@@ -25,10 +27,10 @@ package model {
   }
 
   /** Type of sink */
-  object SinkType extends Enumeration {
-    type Sink = Value
-    val Kinesis, Kafka, Stdout, Test = Value
-  }
+  sealed trait SinkType
+  case object Kinesis extends SinkType
+  case object Kafka extends SinkType
+  case object Stdout extends SinkType
 
   /**
    * Case class for holding both good and
@@ -55,4 +57,54 @@ package model {
    * @param failedBigEvents List of events that were too large
    */
   case class SplitBatchResult(goodBatches: List[List[String]], failedBigEvents: List[String])   
+
+  case class CookieConfig(
+    enabled: Boolean,
+    name: String,
+    expiration: FiniteDuration,
+    domain: Option[String]
+  )
+  case class P3PConfig(policyRef: String, CP: String)
+  case class AWSConfig(accessKey: String, secretKey: String)
+  case class StreamConfig(region: String, good: String, bad: String) {
+    val endpoint = s"https://kinesis.${region}.amazonaws.com"
+  }
+  case class BackoffPolicyConfig(minBackoff: Long, maxBackoff: Long)
+  case class KinesisConfig(
+    threadPoolSize: Int,
+    aws: AWSConfig,
+    stream: StreamConfig,
+    backoffPolicy: BackoffPolicyConfig)
+  case class TopicConfig(good: String, bad: String)
+  case class KafkaConfig(brokers: String, topic: TopicConfig)
+  case class BufferConfig(byteLimit: Int, recordLimit: Int, timeLimit: Long)
+  case class SinkConfig(
+    enabled: String,
+    useIpAddressAsPartitionKey: Boolean,
+    kinesis: KinesisConfig,
+    kafka: KafkaConfig,
+    buffer: BufferConfig
+  ) {
+    // should be moved to a decoder instance when case classy supports them
+    val sinkType = enabled match {
+      case "kinesis" => Kinesis
+      case "kafka"   => Kafka
+      case "stdout"  => Stdout
+      case _         => throw new IllegalArgumentException("collector.sink.enabled unknown")
+    }
+  }
+  case class CollectorConfig(
+    interface: String,
+    port: Int,
+    production: Boolean,
+    p3p: P3PConfig,
+    cookie: CookieConfig,
+    sink: SinkConfig
+  ) {
+    val cookieConfig = if (cookie.enabled) Some(cookie) else None
+
+    def cookieName = cookieConfig.map(_.name)
+    def cookieDomain = cookieConfig.flatMap(_.domain)
+    def cookieExpiration = cookieConfig.map(_.expiration)
+  }
 }

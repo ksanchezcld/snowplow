@@ -23,14 +23,14 @@ import model._
 /**
  * Kafka Sink for the Scala collector
  */
-class KafkaSink(config: CollectorConfig, inputType: InputType.InputType) extends Sink {
+class KafkaSink(config: SinkConfig, inputType: InputType.InputType) extends Sink {
 
   // Records must not exceed MaxBytes - 1MB
   val MaxBytes = 1000000L
 
   private val topicName = inputType match {
-    case InputType.Good => config.kafkaTopicGoodName
-    case InputType.Bad  => config.kafkaTopicBadName
+    case InputType.Good => config.kafka.topic.good
+    case InputType.Bad  => config.kafka.topic.bad
   }
 
   private var kafkaProducer = createProducer
@@ -43,14 +43,14 @@ class KafkaSink(config: CollectorConfig, inputType: InputType.InputType) extends
    */
   private def createProducer: KafkaProducer[String, Array[Byte]] = {
 
-    log.info(s"Create Kafka Producer to brokers: ${config.kafkaBrokers}")
+    log.info(s"Create Kafka Producer to brokers: ${config.kafka.brokers}")
 
     val props = new Properties()
-    props.put("bootstrap.servers", config.kafkaBrokers)
+    props.put("bootstrap.servers", config.kafka.brokers)
     props.put("acks", "all")
     props.put("retries", "0")
-    props.put("batch.size", config.byteLimit.toString)
-    props.put("linger.ms", config.timeLimit.toString)
+    props.put("batch.size", config.buffer.byteLimit.toString)
+    props.put("linger.ms", config.buffer.timeLimit.toString)
     props.put("key.serializer", 
       "org.apache.kafka.common.serialization.StringSerializer")
     props.put("value.serializer", 
@@ -82,5 +82,5 @@ class KafkaSink(config: CollectorConfig, inputType: InputType.InputType) extends
     Nil
   }
 
-  override def getType = SinkType.Kafka
+  override def getType = Kafka
 }

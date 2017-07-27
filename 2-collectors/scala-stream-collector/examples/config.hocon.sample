@@ -30,7 +30,7 @@ collector {
 
   # Configure the P3P policy header.
   p3p {
-    policyref = "/w3c/p3p.xml"
+    policyRef = "/w3c/p3p.xml"
     CP = "NOI DSP COR NID PSA OUR IND COM NAV STA"
   }
 
@@ -38,13 +38,13 @@ collector {
   # with the following domain and expiration.
   cookie {
     enabled = true
-    expiration = {{collectorCookieExpiration}} # e.g. "365 days"
+    expiration = {{cookieExpiration}} # e.g. "365 days"
     # Network cookie name
     name = {{collectorCookieName}}
     # The domain is optional and will make the cookie accessible to other
     # applications on the domain. Comment out this line to tie cookies to
     # the collector's full domain
-    domain = "{{collectorCookieDomain}}"
+    domain = "{{cookieDomain}}"
   }
 
   # The collector has a configurable sink for storing data in
@@ -60,10 +60,13 @@ collector {
     #         to disable all logging.
     #      2. Using 'sbt assembly' and 'java -jar ...' to disable
     #         sbt logging.
-    enabled = "kinesis"
+    enabled = kinesis
+
+    # Whether to use the incoming event's ip as the partition key
+    useIpAddressAsPartitionKey = false
 
     kinesis {
-      thread-pool-size: 10 # Thread pool size for Kinesis API requests
+      threadPoolSize: 10 # Thread pool size for Kinesis API requests
 
       # The following are used to authenticate for the Amazon Kinesis sink.
       #
@@ -74,31 +77,31 @@ collector {
       #
       # If both are set to 'env', use environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
       aws {
-        access-key: "iam"
-        secret-key: "iam"
+        accessKey = iam
+        secretKey = iam
       }
 
       # Data will be stored in the following stream.
       stream {
-        region: "{{collectorSinkKinesisStreamRegion}}"
-        good: "{{collectorKinesisStreamGoodName}}"
-        bad: "{{collectorKinesisStreamBadName}}"
+        region = {{kinesisStreamRegion}}
+        good = {{kinesisStreamGoodName}}
+        bad = {{kinesisStreamBadName}}
       }
 
       # Minimum and maximum backoff periods
-      backoffPolicy: {
-        minBackoff: {{collectorSinkKinesisMinBackoffMillis}}
-        maxBackoff: {{collectorSinkKinesisMaxBackoffMillis}}
+      backoffPolicy {
+        minBackoff = {{kinesisMinBackoffMillis}}
+        maxBackoff = {{kinesisMaxBackoffMillis}}
       }
     }
 
     kafka {
-      brokers: "{{collectorKafkaBrokers}}"
+      brokers = "{{kafkaBrokers}}"
 
       # Data will be stored in the following topics
       topic {
-        good: "{{collectorKafkaTopicGoodName}}"
-        bad: "{{collectorKafkaTopicBadName}}"
+        good = {{kafkaTopicGoodName}}
+        bad = {{kafkaTopicBadName}}
       }
     }
 
@@ -108,9 +111,9 @@ collector {
     # - the combined size of the stored records reaches byte-limit or
     # - the time in milliseconds since the buffer was last emptied reaches time-limit
     buffer {
-      byte-limit: {{collectorSinkBufferByteThreshold}}
-      record-limit: {{collectorSinkBufferRecordThreshold}} # Not supported by Kafka; will be ignored
-      time-limit: {{collectorSinkBufferTimeThreshold}}
+      byteLimit = {{bufferByteThreshold}}
+      recordLimit = {{bufferRecordThreshold}} # Not supported by Kafka; will be ignored
+      timeLimit = {{bufferTimeThreshold}}
     }
   }
 }

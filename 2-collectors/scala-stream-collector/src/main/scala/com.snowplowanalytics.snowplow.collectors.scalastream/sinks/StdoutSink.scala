@@ -38,5 +38,5 @@ class StdoutSink(inputType: InputType.InputType) extends Sink {
     Nil
   }
 
-  override def getType = SinkType.Stdout
+  override def getType = Stdout
 }
