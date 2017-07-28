@@ -37,6 +37,7 @@ object SnowplowStreamEnrichBuild extends Build {
         Libraries.argot,
         Libraries.scalazon,
         Libraries.scalaz7,
+        Libraries.json4sJackson,
         Libraries.snowplowRawEvent,
         Libraries.snowplowCommonEnrich,
         Libraries.igluClient,
