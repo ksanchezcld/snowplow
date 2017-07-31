@@ -44,7 +44,7 @@ object SnowplowStreamEnrichBuild extends Build {
         Libraries.igluClient,
         Libraries.snowplowTracker,
         Libraries.specs2,
-        Libraries.scalazSpecs2
+        Libraries.scalacheck
       )
     )
 }
