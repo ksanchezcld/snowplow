@@ -64,6 +64,11 @@ package model {
     expiration: FiniteDuration,
     domain: Option[String]
   )
+  case class CookieBounceConfig(
+    enabled: Boolean,
+    name: String,
+    fallbackNetworkUserId: String
+  )
   case class P3PConfig(policyRef: String, CP: String)
   case class AWSConfig(accessKey: String, secretKey: String)
   case class StreamConfig(region: String, good: String, bad: String) {
@@ -102,6 +107,7 @@ package model {
     production: Boolean,
     p3p: P3PConfig,
     cookie: CookieConfig,
+    cookieBounce: CookieBounceConfig,
     sink: SinkConfig
   ) {
     val cookieConfig = if (cookie.enabled) Some(cookie) else None
