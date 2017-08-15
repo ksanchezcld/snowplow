@@ -84,7 +84,7 @@ package model {
     stream: StreamConfig,
     backoffPolicy: BackoffPolicyConfig)
   case class TopicConfig(good: String, bad: String)
-  case class KafkaConfig(brokers: String, topic: TopicConfig)
+  case class KafkaConfig(brokers: String, topic: TopicConfig, retries: Int)
   case class BufferConfig(byteLimit: Int, recordLimit: Int, timeLimit: Long)
   case class SinkConfig(
     enabled: String,

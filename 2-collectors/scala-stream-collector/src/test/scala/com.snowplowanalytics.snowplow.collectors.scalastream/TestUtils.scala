@@ -35,7 +35,7 @@ object TestUtils {
         stream = StreamConfig("us-east-1", "good", "bad"),
         backoffPolicy = BackoffPolicyConfig(3000, 60000)
       ),
-      kafka = KafkaConfig("localhost:9092", TopicConfig("good", "bad")),
+      kafka = KafkaConfig("localhost:9092", TopicConfig("good", "bad"), 1),
       buffer = BufferConfig(4000000, 500, 60000)
     )
   )

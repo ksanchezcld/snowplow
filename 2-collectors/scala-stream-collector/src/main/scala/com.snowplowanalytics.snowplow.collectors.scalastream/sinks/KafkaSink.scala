@@ -48,7 +48,7 @@ class KafkaSink(config: SinkConfig, inputType: InputType.InputType) extends Sink
     val props = new Properties()
     props.put("bootstrap.servers", config.kafka.brokers)
     props.put("acks", "all")
-    props.put("retries", "0")
+    props.put("retries", config.kafka.retries.toString)
     props.put("batch.size", config.buffer.byteLimit.toString)
     props.put("linger.ms", config.buffer.timeLimit.toString)
     props.put("key.serializer", 
@@ -66,7 +66,7 @@ class KafkaSink(config: SinkConfig, inputType: InputType.InputType) extends Sink
    * @param key The partition key to use
    */
   override def storeRawEvents(events: List[Array[Byte]], key: String): List[Array[Byte]] = {
-    log.debug(s"Writing ${events.size} Thrift records to Kafka topic ${topicName} at key ${key}")
+    log.debug(s"Writing ${events.size} Thrift records to Kafka topic $topicName at key $key")
     events.foreach { event =>
       kafkaProducer.send(
         new ProducerRecord(topicName, key, event),
