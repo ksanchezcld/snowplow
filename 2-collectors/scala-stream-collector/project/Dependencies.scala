@@ -29,7 +29,7 @@ object Dependencies {
     val kafka                = "0.10.2.1"
     val config               = "1.3.1"
     // Scala
-    val snowplowCommonEnrich = "0.25.0"
+    val snowplowCommonEnrich = "0.26.0"
     val collectorPayload     = "0.0.0"
     val scalaz7              = "7.0.9"
     val akkaHttp             = "10.0.9"
