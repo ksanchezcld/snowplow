@@ -1,11 +1,11 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    CFPropertyList (2.3.2)
+    CFPropertyList (2.3.6)
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
     awrence (0.1.0)
-    builder (3.2.2)
+    builder (3.2.4)
     contracts (0.11.0)
     coveralls (0.8.15)
       json (>= 1.8, < 3)
@@ -15,13 +15,14 @@ GEM
       tins (>= 1.6.0, < 2)
     diff-lcs (1.2.5)
     docile (1.1.5)
-    domain_name (0.5.20170404)
+    domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    elasticity (6.0.12)
+    dry-inflector (0.1.2)
+    elasticity (6.0.14)
       fog-aws (~> 1.0)
       rest-client (~> 1.0)
       unf (~> 0.1)
-    excon (0.52.0)
+    excon (0.93.0)
     fission (0.5.0)
       CFPropertyList (~> 2.2)
     fog (1.25.0)
@@ -39,26 +40,26 @@ GEM
       ipaddress (~> 0.5)
       nokogiri (~> 1.5, >= 1.5.11)
       opennebula
-    fog-aws (1.4.0)
+    fog-aws (1.4.1)
       fog-core (~> 1.38)
       fog-json (~> 1.0)
       fog-xml (~> 0.1)
       ipaddress (~> 0.8)
-    fog-brightbox (0.11.0)
-      fog-core (~> 1.22)
-      fog-json
-      inflecto (~> 0.0.2)
-    fog-core (1.42.0)
-      builder
-      excon (~> 0.49)
-      formatador (~> 0.2)
-    fog-json (1.0.2)
-      fog-core (~> 1.0)
-      multi_json (~> 1.10)
-    fog-profitbricks (0.0.5)
+    fog-brightbox (0.16.1)
+      dry-inflector
       fog-core
-      fog-xml
-      nokogiri
+      fog-json
+      mime-types
+    fog-core (1.45.0)
+      builder
+      excon (~> 0.58)
+      formatador (~> 0.2)
+    fog-json (1.2.0)
+      fog-core
+      multi_json (~> 1.10)
+    fog-profitbricks (4.1.1)
+      fog-core (~> 1.42)
+      fog-json (~> 1.0)
     fog-radosgw (0.0.5)
       fog-core (>= 1.21.0)
       fog-json
@@ -78,41 +79,48 @@ GEM
     fog-voxel (0.1.0)
       fog-core
       fog-xml
-    fog-xml (0.1.2)
+    fog-xml (0.1.4)
       fog-core
-      nokogiri (~> 1.5, >= 1.5.11)
-    formatador (0.2.5)
-    http-cookie (1.0.3)
+      nokogiri (>= 1.5.11, < 2.0.0)
+    formatador (0.3.0)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     iglu-ruby-client (0.1.0)
       httparty (<= 0.14.0)
       json-schema (~> 2.7.0, >= 2.7.0)
-    inflecto (0.0.2)
     ipaddress (0.8.3)
-    jruby-jars (9.1.4.0)
-    jruby-rack (1.1.20)
-    json (2.0.2-java)
+    json (2.6.2)
+    json (2.6.2-java)
     json-schema (2.7.0)
       addressable (>= 2.4)
     mime-types (2.99.3)
-    multi_json (1.12.1)
+    mini_portile2 (2.4.0)
+    multi_json (1.15.0)
     multi_xml (0.6.0)
     net-ssh (2.9.4)
     netrc (0.11.0)
-    nokogiri (1.6.8-java)
-    opennebula (5.0.2)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
+    nokogiri (1.10.10-java)
+    opennebula (6.4.2)
+      ipaddress
       json
       nokogiri
+      parse-cron
       rbvmomi
+      treetop
+      xmlrpc
+    optimist (3.0.1)
+    parse-cron (0.1.4)
+    polyglot (0.3.5)
     public_suffix (2.0.5)
-    rake (11.2.2)
-    rbvmomi (1.9.2)
-      builder (~> 3.2)
+    rbvmomi (2.4.1)
+      builder (~> 3.0)
       json (>= 1.8)
       nokogiri (~> 1.5)
-      trollop (~> 2.1)
+      optimist (~> 3.0)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
@@ -125,7 +133,6 @@ GEM
     rspec-expectations (2.99.2)
       diff-lcs (>= 1.1.3, < 2.0)
     rspec-mocks (2.99.4)
-    rubyzip (1.2.0)
     simplecov (0.12.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -141,16 +148,19 @@ GEM
       tins (~> 1.0)
     thor (0.19.1)
     tins (1.12.0)
-    trollop (2.1.2)
+    treetop (1.6.11)
+      polyglot (~> 0.3)
+    unf (0.1.4)
+      unf_ext
     unf (0.1.4-java)
-    warbler (2.0.3)
-      jruby-jars (>= 9.0.0.0)
-      jruby-rack (>= 1.1.1, < 1.3)
-      rake (>= 10.1.0)
-      rubyzip (~> 1.0, < 1.4)
+    unf_ext (0.0.8.2)
+    webrick (1.7.0)
+    xmlrpc (0.3.2)
+      webrick
 
 PLATFORMS
   java
+  ruby
 
 DEPENDENCIES
   awrence (~> 0.1.0)
@@ -161,10 +171,9 @@ DEPENDENCIES
   rspec (~> 2.14, >= 2.14.1)
   sluice (~> 0.4.0)
   snowplow-tracker (~> 0.5.2)
-  warbler
 
 RUBY VERSION
    ruby 2.3.1p0 (jruby 9.1.6.0)
 
 BUNDLED WITH
-   1.15.1
+   1.17.3
